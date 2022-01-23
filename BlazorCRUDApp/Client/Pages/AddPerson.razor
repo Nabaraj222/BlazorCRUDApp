@@ -1,0 +1,65 @@
+﻿@page "/addperson"
+@using BlazorCRUDApp.Shared
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
+<h2>Add Person</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="FirstName"> First Name *</label>
+            <input form="FirstName" class="form-control" @bind="@person.FirstName" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="LastName"> Last Name *</label>
+            <input form="LastName" class="form-control" @bind="@person.LastName" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="Email"> Email *</label>
+            <input form="Email" class="form-control" @bind="@person.Email" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="MobileNo"> Mobile No *</label>
+            <input form="mobileNo" class="form-control" @bind="@person.MobileNo" />
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <input type="button" class="btn btn-primary" @onclick="@Save" value="Save" />
+            <input type="button" class="btn" @onclick="@Cancel" value="Cancel" />
+        </div>
+    </div>
+</div>
+@code {
+    PersonViewModel person = new PersonViewModel();
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+    protected async Task Save()
+    {
+        var response = await Http.PostAsJsonAsync("api/Person", @person);
+        PersonViewModel personResponse = await response.Content.ReadFromJsonAsync<PersonViewModel>();
+        if (personResponse?.Id > 0)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Saved Successfully!");
+            NavigationManager.NavigateTo("personlist");
+        }
+
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("personlist");
+    }
+
+}

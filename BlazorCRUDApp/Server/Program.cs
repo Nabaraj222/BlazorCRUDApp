@@ -1,4 +1,8 @@
-using Microsoft.AspNetCore.ResponseCompression;
+using BlazorCRUDApp.Server.AppDbContext;
+using BlazorCRUDApp.Server.Models;
+using BlazorCRUDApp.Server.Repository;
+using BlazorCRUDApp.Server.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +10,16 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+// For entity Framework
+builder.Services.AddDbContext<ApplicationDbContext>(options => 
+{ 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+// For DI registration
+builder.Services.AddTransient<IRepository<Person>, PersonRepository>();
+builder.Services.AddTransient<IPersonService, PersonService>();
 
 var app = builder.Build();
 

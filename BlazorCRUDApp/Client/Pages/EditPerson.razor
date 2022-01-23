@@ -1,0 +1,67 @@
+﻿@page "/editperson/{Id}"
+@using BlazorCRUDApp.Shared
+
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
+<h2>Edit Person</h2>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="FirstName"> First Name *</label>
+            <input form="FirstName" class="form-control" @bind="@person.FirstName" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="LastName"> Last Name *</label>
+            <input form="LastName" class="form-control" @bind="@person.LastName" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="Email"> Email *</label>
+            <input form="Email" class="form-control" @bind="@person.Email" />
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="MobileNo"> Mobile No *</label>
+            <input form="mobileNo" class="form-control" @bind="@person.MobileNo" />
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="form-group">
+            <input type="button" class="btn btn-primary" @onclick="@Save" value="Save" />
+            <input type="button" class="btn" @onclick="@Cancel" value="Cancel" />
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public string Id{ get; set; }
+    PersonViewModel person = new PersonViewModel();
+    protected override async Task OnInitializedAsync()
+    {
+        person = await Http.GetFromJsonAsync<PersonViewModel>("api/person/" + Id);
+    }
+    protected async Task Save()
+    {
+        var response = await Http.PutAsJsonAsync("api/Person/" + Id, @person);
+        bool personResponse = await response.Content.ReadFromJsonAsync<bool>();
+        if (personResponse)
+        {
+            await JsRuntime.InvokeVoidAsync("alert", "Updated Successfully!");
+            NavigationManager.NavigateTo("personlist");
+        }
+
+    }
+    void Cancel()
+    {
+        NavigationManager.NavigateTo("personlist");
+    }
+
+}

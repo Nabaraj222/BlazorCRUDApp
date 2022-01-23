@@ -1,0 +1,47 @@
+﻿@page "/personlist"
+@using BlazorCRUDApp.Shared
+
+@inject HttpClient _httpClient
+
+<h1>Personal Detail</h1>
+<div>
+    <a href="/addperson"> Create New Person</a>
+    @if (personList != null)
+    {
+        <table class="table-bordered">
+            <thead>
+                <tr>
+                    <th width = "30%">Name</th>
+                    <th width = "20%">Email</th>
+                    <th width = "20%">Mobile No</th>
+                    <th width = "30%">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in personList)
+                {
+                    <tr>
+                        <td>
+                            @p.FirstName @p.LastName
+                        </td>
+                    <td>@p.Email</td>
+                    <td>@p.MobileNo</td>
+                    <td>
+                        <a href="/editperson/@p.Id">Edit</a> |
+                        <a href="/deleteperson/@p.Id">Delete</a>
+                    </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+@code {
+    List<PersonViewModel> personList = new List<PersonViewModel>();
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await _httpClient.GetAsync("api/person");
+        response.EnsureSuccessStatusCode();
+        personList = await response.Content.ReadFromJsonAsync<List<PersonViewModel>>();
+    }
+}
